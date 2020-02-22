@@ -1,0 +1,9 @@
+.eggs/
+dist/
+build/
+*~
+*.so
+*-info/
+tmp/
+pyspoa/
+venv*/
