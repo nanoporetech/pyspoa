@@ -114,6 +114,7 @@ setup(
     url='https://github.com/nanoporetech/pyspoa',
     description='Python bindings to spoa',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.4'],
     setup_requires=['pybind11>=2.4'],
