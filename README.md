@@ -38,8 +38,8 @@ $ source pyspoa/venv/active
 ### Licence and Copyright
 (c) 2019 Oxford Nanopore Technologies Ltd.
 
-fast-ctc-decode is distributed under the terms of the MIT License.  If a copy of the License
-was not distributed with this file, You can obtain one at https://github.com/nanoporetech/fast-ctc-decode/
+pyspoa is distributed under the terms of the MIT License.  If a copy of the License
+was not distributed with this file, You can obtain one at https://github.com/nanoporetech/pyspoa
 
 ### Research Release
 
