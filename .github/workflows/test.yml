@@ -11,12 +11,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
+      - uses: textbook/git-checkout-submodule-action@master
       - uses: actions/setup-python@v1
         with:
           python-version: '3.7'
       - name: Test ${{ matrix.os }} binding
         run: |
-          git submodule sync --recursive
           python3 -m venv venv3
           source venv3/bin/activate
           python3 -m pip install -r requirements.txt
