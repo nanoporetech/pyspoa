@@ -25,7 +25,7 @@ auto poa(vector<string> sequences, int algorithm, bool genmsa,
     string consensus = graph->generate_consensus();
     vector<string> msa;
     if (genmsa) graph->generate_multiple_sequence_alignment(msa);
-    return make_tuple(consensus, msa);
+    return pybind11::make_tuple(consensus, msa);
 }
 
 PYBIND11_MODULE(spoa, m) {
