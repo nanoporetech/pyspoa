@@ -1,5 +1,7 @@
 # pyspoa
 
+![test-pyspoa](https://github.com/nanoporetech/pyspoa/workflows/test-pyspoa/badge.svg)
+
 Python bindings to [spoa](https://github.com/rvaser/spoa).
 
 ## Installation
