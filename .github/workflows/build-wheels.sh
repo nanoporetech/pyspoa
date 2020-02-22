@@ -10,6 +10,7 @@ for PYBIN in /opt/python/cp3[5678]*/bin; do
     make test
     "${PYBIN}/python3" setup.py bdist_wheel
     deactivate
+    make clean
 done
 
 for wheel in dist/*.whl; do
