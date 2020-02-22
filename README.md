@@ -1,6 +1,6 @@
 # pyspoa
 
-![test-pyspoa](https://github.com/nanoporetech/pyspoa/workflows/test-pyspoa/badge.svg)
+![test-pyspoa](https://github.com/nanoporetech/pyspoa/workflows/test-pyspoa/badge.svg) [![PyPI version](https://badge.fury.io/py/pyspoa.svg)](https://badge.fury.io/py/pyspoa)
 
 Python bindings to [spoa](https://github.com/rvaser/spoa).
 
