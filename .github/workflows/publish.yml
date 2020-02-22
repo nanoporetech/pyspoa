@@ -12,10 +12,6 @@ jobs:
      - name: Build wheels
        run: |
          git submodule update --init --recursive
-         python3 -m venv venv3
-         source venv3/bin/activate
-         python3 -m pip install -r requirements.txt
-         make test
          bash .github/workflows/build-wheels.sh
      - uses: actions/upload-artifact@v1
        with:
@@ -43,4 +39,4 @@ jobs:
      - uses: actions/upload-artifact@v1
        with:
          name: osx-${{ matrix.python-version }}-wheel
-         path: target/wheels
+         path: dist/
