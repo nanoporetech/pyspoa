@@ -90,6 +90,7 @@ ext_modules = [
         ['pyspoa.cpp'],
         include_dirs=[
             'src/include/spoa',
+            'src/vendor/cereal/include',
             get_pybind_include(),
             get_pybind_include(user=True),
         ],
@@ -108,7 +109,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name='pyspoa',
-    version='0.0.2',
+    version='0.0.3',
     author='Oxford Nanoporetech Technologies, Ltd.',
     author_email='support@nanoporetech.com',
     url='https://github.com/nanoporetech/pyspoa',
