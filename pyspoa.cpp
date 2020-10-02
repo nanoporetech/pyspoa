@@ -2,12 +2,9 @@
 #include <pybind11/stl.h>
 #include <pybind11/pybind11.h>
 
-using namespace std;
-using namespace pybind11;
-using namespace pybind11::literals;
+using namespace pybind11::literals;  // for _a in pybind def
 
-
-auto poa(vector<string> sequences, int algorithm, bool genmsa,
+auto poa(std::vector<std::string> sequences, int algorithm, bool genmsa,
 	 int m, int n, int g, int e, int q, int c) -> pybind11::tuple
 {
     auto alignment_engine = spoa::AlignmentEngine::Create(
