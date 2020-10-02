@@ -90,6 +90,7 @@ ext_modules = [
         ['pyspoa.cpp'],
         include_dirs=[
             'src/include/spoa',
+            'src/vendor/cereal/include',
             get_pybind_include(),
             get_pybind_include(user=True),
         ],

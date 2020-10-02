@@ -3,7 +3,6 @@
 #include <pybind11/pybind11.h>
 
 using namespace std;
-using namespace spoa;
 using namespace pybind11;
 using namespace pybind11::literals;
 
@@ -11,20 +10,20 @@ using namespace pybind11::literals;
 auto poa(vector<string> sequences, int algorithm, bool genmsa,
 	 int m, int n, int g, int e, int q, int c) -> pybind11::tuple
 {
-    auto alignment_engine = createAlignmentEngine(
-       static_cast<AlignmentType>(algorithm), m, n, g, e, q, c
-    );
+    auto alignment_engine = spoa::AlignmentEngine::Create(
+       spoa::AlignmentType::kSW, m, n, g, e, q, c);
 
-    auto graph = createGraph();
+    spoa::Graph graph{};
 
     for (const auto& it: sequences) {
-	auto alignment = alignment_engine->align(it, graph);
-	graph->add_alignment(alignment, it);
+	    auto alignment = alignment_engine->Align(it, graph);
+	    graph.AddAlignment(alignment, it);
     }
 
-    string consensus = graph->generate_consensus();
-    vector<string> msa;
-    if (genmsa) graph->generate_multiple_sequence_alignment(msa);
+    auto consensus = graph.GenerateConsensus();
+    std::vector<std::string> msa;
+    if (genmsa)
+        msa = graph.GenerateMultipleSequenceAlignment();
     return pybind11::make_tuple(consensus, msa);
 }
 
