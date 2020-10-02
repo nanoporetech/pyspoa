@@ -1,6 +1,9 @@
-build:
+buildenv/bin/activate:
+	python3 -m venv buildenv
+
+build: buildenv/bin/activate
 	mkdir -p src/build
-	cd src/build && cmake -D spoa_generate_dispatch=ON -DCMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS="-fPIC" .. && make
+	. ./buildenv/bin/activate && pip install cmake && cd src/build && cmake -D spoa_generate_dispatch=ON -DCMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS="-fPIC" .. && make
 	python3 setup.py develop
 
 test: build
