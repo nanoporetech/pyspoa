@@ -89,13 +89,13 @@ ext_modules = [
         'spoa',
         ['pyspoa.cpp'],
         include_dirs=[
-            'src/include/spoa',
+            'spoa/include/spoa',
             get_pybind_include(),
             get_pybind_include(user=True),
         ],
         language='c++',
         extra_objects=[
-            'src/build/lib/libspoa.a'
+            'spoa/build/lib/libspoa.a'
         ],
 
     ),
