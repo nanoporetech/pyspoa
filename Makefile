@@ -2,7 +2,7 @@
 build:
 	cmake --version
 	mkdir -p src/build
-	cd src/build && cmake -D optimize_for_portability=ON -DCMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS="-I ../vendor/cereal/include/ -fPIC" .. && make
+	cd src/build && cmake -D spoa_optimize_for_portability=ON -DCMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS="-I ../vendor/cereal/include/ -fPIC" .. && make
 	python3 setup.py develop
 
 test: build
