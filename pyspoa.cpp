@@ -8,7 +8,8 @@ auto poa(std::vector<std::string> sequences, int algorithm, bool genmsa,
 	 int m, int n, int g, int e, int q, int c) -> pybind11::tuple
 {
     auto alignment_engine = spoa::AlignmentEngine::Create(
-       spoa::AlignmentType::kSW, m, n, g, e, q, c);
+      static_cast<spoa::AlignmentType>(algorithm), m, n, g, e, q, c
+    );
 
     spoa::Graph graph{};
 
