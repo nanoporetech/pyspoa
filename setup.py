@@ -1,7 +1,11 @@
+import os
 import sys
 import setuptools
+from subprocess import run
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+
+from setuptools.command.install import install
 
 
 class get_pybind_include(object):
@@ -107,9 +111,21 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 
+class build_spoa(install):
+    def run(self):
+        bdir = "src/build"
+        os.makedirs(bdir)
+        run([
+            "cmake", "-D", "spoa_optimize_for_portability=ON", "-D", "CMAKE_BUILD_TYPE=Release",
+            "-D", "CMAKE_CXX_FLAGS='-I ../vendor/cereal/include/ -fPIC '",  "..",
+        ], cwd=bdir)
+        run("make", cwd=bdir)
+        install.run(self)
+
+
 setup(
     name='pyspoa',
-    version='0.0.7',
+    version='0.0.8',
     author='Oxford Nanoporetech Technologies, Ltd.',
     author_email='support@nanoporetech.com',
     url='https://github.com/nanoporetech/pyspoa',
@@ -117,8 +133,12 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.4'],
-    setup_requires=['pybind11>=2.4'],
-    cmdclass={'build_ext': BuildExt},
+    install_requires=['pybind11>=2.4', 'cmake==3.18.2'],
+    setup_requires=['pybind11>=2.4', 'cmake==3.18.2'],
+    cmdclass={
+        'build_ext': BuildExt,
+        'develop': build_spoa,
+        'install': build_spoa,
+    },
     zip_safe=False,
 )
