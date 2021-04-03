@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e -x
 
-for PYBIN in /opt/python/cp3[56789]*/bin; do
+for PYBIN in /opt/python/cp3[6789]*/bin; do
     rm -rf venv3
     "${PYBIN}/python3" -m venv venv3
     source venv3/bin/activate
