@@ -135,8 +135,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.4', 'cmake==3.18.2', 'scikit-build'],
-    setup_requires=['pybind11>=2.4', 'cmake==3.18.2', 'scikit-build'],
+    install_requires=['pybind11>=2.4', 'cmake==3.18.4'],
+    setup_requires=['pybind11>=2.4', 'cmake==3.18.4'],
     cmdclass={
         'build_ext': BuildExt,
         'develop': build_spoa,
