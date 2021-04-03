@@ -1,6 +1,7 @@
 import os
 import sys
 import setuptools
+from shutil import rmtree
 from subprocess import run
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -114,6 +115,7 @@ with open('README.md', encoding='utf-8') as f:
 class build_spoa(install):
     def run(self):
         bdir = "src/build"
+        rmtree(bdir, ignore_errors=True)
         os.makedirs(bdir)
         run([
             "cmake", "-D", "spoa_optimize_for_portability=ON", "-D", "CMAKE_BUILD_TYPE=Release",
@@ -133,8 +135,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.4', 'cmake==3.18.2'],
-    setup_requires=['pybind11>=2.4', 'cmake==3.18.2'],
+    install_requires=['pybind11>=2.4', 'cmake==3.18.2', 'scikit-build'],
+    setup_requires=['pybind11>=2.4', 'cmake==3.18.2', 'scikit-build'],
     cmdclass={
         'build_ext': BuildExt,
         'develop': build_spoa,
