@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     container: quay.io/pypa/manylinux2010_x86_64
     steps:
-     - uses: actions/checkout@v1
+     - uses: actions/checkout@v3
      - name: Build wheels
        run: |
          git submodule update --init --recursive
          bash .github/workflows/build-wheels.sh
-     - uses: actions/upload-artifact@v1
+     - uses: actions/upload-artifact@v3
        with:
          name: linux-wheels
          path: wheelhouse/
@@ -25,10 +25,10 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10, 3.11]
     steps:
-     - uses: actions/checkout@v1
-     - uses: actions/setup-python@v1
+     - uses: actions/checkout@v3
+     - uses: actions/setup-python@v4
        with:
          python-version: ${{ matrix.python-version }}
      - name: Build wheels
@@ -39,7 +39,7 @@ jobs:
          python3 -m pip install -r requirements.txt
          make test
          python3 setup.py bdist_wheel
-     - uses: actions/upload-artifact@v1
+     - uses: actions/upload-artifact@v3
        with:
          name: osx-${{ matrix.python-version }}-wheel
          path: dist/
