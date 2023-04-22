@@ -38,9 +38,7 @@ jobs:
        run: |
          python3 -m venv venv3
          source venv3/bin/activate
-         python3 -m pip install -r requirements.txt
          make test
-         python3 setup.py bdist_wheel
      - uses: actions/upload-artifact@v3
        with:
          name: osx-${{ matrix.python-version }}-wheel
