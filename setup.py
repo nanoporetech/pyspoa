@@ -1,5 +1,8 @@
 import os
 import sys
+from shutil import rmtree
+from subprocess import run
+
 import setuptools
 from setuptools import setup, Extension
 from setuptools.command.install import install
@@ -51,6 +54,17 @@ def cpp_flag(compiler):
     raise RuntimeError('Unsupported compiler -- at least C++11 support is needed!')
 
 
+def build_spoa():
+    bdir = "src/build"
+    rmtree(bdir, ignore_errors=True)
+    os.makedirs(bdir)
+    run([
+        "cmake", "-D", "spoa_optimize_for_portability=ON", "-D", "CMAKE_BUILD_TYPE=Release",
+        "-D", "CMAKE_CXX_FLAGS='-I ../vendor/cereal/include/ -fPIC '",  "..",
+    ], cwd=bdir)
+    run("make", cwd=bdir)
+
+
 class BuildExt(build_ext):
     """
     A custom build extension for adding compiler-specific options.
@@ -70,6 +84,7 @@ class BuildExt(build_ext):
         l_opts['unix'] += darwin_opts
 
     def build_extensions(self):
+        build_spoa()
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
         link_opts = self.l_opts.get(ct, [])
