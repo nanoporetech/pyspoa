@@ -1,5 +1,5 @@
 build:
-	python3 setup.py develop
+	pip wheel .
 
 test: build
 	python3 tests/test_pyspoa.py

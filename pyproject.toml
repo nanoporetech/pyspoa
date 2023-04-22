@@ -1,0 +1,3 @@
+[build-system]
+requires = ["pip", "setuptools", "wheel", "pybind", "auditwheel", "scikit-wheel"]
+build-backend = "setuptools.build_meta"

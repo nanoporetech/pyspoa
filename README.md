@@ -33,7 +33,6 @@ $ git clone --recursive https://github.com/nanoporetech/pyspoa.git
 $ cd pyspoa
 $ python3 -m venv pyspoa
 $ source pyspoa/bin/activate
-(pyspoa) $ pip install -r requirements.txt
 (pyspoa) $ make build
 ```
 
