@@ -1,12 +1,12 @@
 import os
 import sys
-import setuptools
 from shutil import rmtree
 from subprocess import run
-from setuptools import setup, Extension
-from setuptools.command.build_ext import build_ext
 
+import setuptools
+from setuptools import setup, Extension
 from setuptools.command.install import install
+from setuptools.command.build_ext import build_ext
 
 
 class get_pybind_include(object):
@@ -54,6 +54,17 @@ def cpp_flag(compiler):
     raise RuntimeError('Unsupported compiler -- at least C++11 support is needed!')
 
 
+def build_spoa():
+    bdir = "src/build"
+    rmtree(bdir, ignore_errors=True)
+    os.makedirs(bdir)
+    run([
+        "cmake", "-D", "spoa_optimize_for_portability=ON", "-D", "CMAKE_BUILD_TYPE=Release",
+        "-D", "CMAKE_CXX_FLAGS='-I ../vendor/cereal/include/ -fPIC '",  "..",
+    ], cwd=bdir)
+    run("make", cwd=bdir)
+
+
 class BuildExt(build_ext):
     """
     A custom build extension for adding compiler-specific options.
@@ -73,6 +84,7 @@ class BuildExt(build_ext):
         l_opts['unix'] += darwin_opts
 
     def build_extensions(self):
+        build_spoa()
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
         link_opts = self.l_opts.get(ct, [])
@@ -112,18 +124,6 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 
-class build_spoa(install):
-    def run(self):
-        bdir = "src/build"
-        rmtree(bdir, ignore_errors=True)
-        os.makedirs(bdir)
-        run([
-            "cmake", "-D", "spoa_optimize_for_portability=ON", "-D", "CMAKE_BUILD_TYPE=Release",
-            "-D", "CMAKE_CXX_FLAGS='-I ../vendor/cereal/include/ -fPIC '",  "..",
-        ], cwd=bdir)
-        run("make", cwd=bdir)
-        install.run(self)
-
 
 setup(
     name='pyspoa',
@@ -135,12 +135,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.4', 'cmake==3.18.4'],
-    setup_requires=['pybind11>=2.4', 'cmake==3.18.4'],
     cmdclass={
         'build_ext': BuildExt,
-        'develop': build_spoa,
-        'install': build_spoa,
     },
     zip_safe=False,
 )

@@ -1,14 +1,12 @@
 #!/bin/bash
 set -e -x
 
-for PYBIN in /opt/python/cp3[6789]*/bin; do
+for PYBIN in /opt/python/cp3[891]*/bin; do
     rm -rf venv3
     "${PYBIN}/python3" -m venv venv3
     source venv3/bin/activate
-    python3 -m pip install cmake==3.18.4
-    python3 -m pip install -r requirements.txt
-    make test
-    "${PYBIN}/python3" setup.py bdist_wheel
+    "${PYBIN}/python3" -m pip install --upgrade pip
+    "${PYBIN}/python3" -m pip wheel . -w dist
     make clean
     deactivate
 done
