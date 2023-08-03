@@ -2,7 +2,7 @@ import os
 import sys
 from shutil import rmtree
 from subprocess import run
-
+import platform
 import setuptools
 from setuptools import setup, Extension
 from setuptools.command.install import install
@@ -58,10 +58,17 @@ def build_spoa():
     bdir = "src/build"
     rmtree(bdir, ignore_errors=True)
     os.makedirs(bdir)
-    run([
-        "cmake", "-D", "spoa_optimize_for_portability=ON", "-D", "CMAKE_BUILD_TYPE=Release",
-        "-D", "CMAKE_CXX_FLAGS='-I ../vendor/cereal/include/ -fPIC '",  "..",
-    ], cwd=bdir)
+    extra_flags = []
+    if platform.machine() in {"aarch64", "arm64"}:
+        ["-D", "spoa_use_simde=ON", "-D", "spoa_use_simde_nonvec=ON", "-D", "spoa_use_simde_openmp=ON"]
+    else:
+        # x86 -- builds with -msse4.1 instead of -march=native
+        ["-D", "spoa_optimize_for_portability=ON"]
+    run(
+        ["cmake"] + extra_flags + [
+            "-D", "CMAKE_BUILD_TYPE=Release",
+            "-D", "CMAKE_CXX_FLAGS='-I ../vendor/cereal/include/ -fPIC '",
+            ".."], cwd=bdir)
     run("make", cwd=bdir)
 
 
@@ -127,7 +134,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name='pyspoa',
-    version='0.0.9',
+    version='0.0.10',
     author='Oxford Nanoporetech Technologies, Ltd.',
     author_email='support@nanoporetech.com',
     url='https://github.com/nanoporetech/pyspoa',
