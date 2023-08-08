@@ -9,7 +9,10 @@ jobs:
 
   linux-wheels:
     runs-on: ubuntu-latest
-    container: quay.io/pypa/manylinux_2_28_x86_64
+    strategy:
+      matrix:
+        container: [quay.io/pypa/manylinux_2_28_x86_64, quay.io/pypa/manylinux2014_aarch64]
+    container: ${{ matrix.container }}
     steps:
      - uses: actions/checkout@v3
        with:
@@ -21,6 +24,7 @@ jobs:
        with:
          name: linux-wheels
          path: wheelhouse/
+
 
   osx-wheels:
     runs-on: macos-latest
