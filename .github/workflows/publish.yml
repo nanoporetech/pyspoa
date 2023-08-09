@@ -1,4 +1,4 @@
-name: publish-pyspao
+name: publish-pyspoa
 
 on:
   push:

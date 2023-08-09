@@ -8,6 +8,10 @@ from setuptools import setup, Extension
 from setuptools.command.install import install
 from setuptools.command.build_ext import build_ext
 
+LIB_SPOA = 'src/build/lib/libspoa.a'
+if os.environ.get('libspoa'):
+    LIB_SPOA = os.environ['libspoa']
+
 
 class get_pybind_include(object):
     """
@@ -58,12 +62,13 @@ def build_spoa():
     bdir = "src/build"
     rmtree(bdir, ignore_errors=True)
     os.makedirs(bdir)
-    extra_flags = []
+    # x86 -- builds with -msse4.1 instead of -march=native
+    extra_flags = ["-D", "spoa_optimize_for_portability=ON"]
     if platform.machine() in {"aarch64", "arm64"}:
-        ["-D", "spoa_use_simde=ON", "-D", "spoa_use_simde_nonvec=ON", "-D", "spoa_use_simde_openmp=ON"]
-    else:
-        # x86 -- builds with -msse4.1 instead of -march=native
-        ["-D", "spoa_optimize_for_portability=ON"]
+        extra_flags = [
+            "-D", "spoa_use_simde=ON",
+            "-D", "spoa_use_simde_nonvec=ON",
+            "-D", "spoa_use_simde_openmp=ON"]
     run(
         ["cmake"] + extra_flags + [
             "-D", "CMAKE_BUILD_TYPE=Release",
@@ -91,7 +96,8 @@ class BuildExt(build_ext):
         l_opts['unix'] += darwin_opts
 
     def build_extensions(self):
-        build_spoa()
+        if not os.environ.get('libspoa'):
+            build_spoa()
         ct = self.compiler.compiler_type
         opts = self.c_opts.get(ct, [])
         link_opts = self.l_opts.get(ct, [])
@@ -120,7 +126,7 @@ ext_modules = [
         ],
         language='c++',
         extra_objects=[
-            'src/build/lib/libspoa.a'
+            LIB_SPOA
         ],
 
     ),
