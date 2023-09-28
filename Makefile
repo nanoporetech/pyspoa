@@ -1,13 +1,27 @@
-build:
-	pip wheel . -w dist
+PYTHON ?= python3
 
+IN_VENV=. ./venv/bin/activate
+
+venv/bin/activate:
+	test -d venv || $(PYTHON) -m venv venv
+	${IN_VENV} && pip install pip --upgrade
+
+.PHONY: build
+build: venv/bin/activate
+	${IN_VENV} && pip wheel . -w dist
+
+.PHONY: install
 install: build
-	pip install dist/pyspoa*.whl
+	${IN_VENV} && pip install dist/pyspoa*.whl
 
+.PHONY: test
 test: install
-	python3 tests/test_pyspoa.py
+	${IN_VENV} && python tests/test_pyspoa.py
+
+sdist: venv/bin/activate
+	${IN_VENV} && python setup.py sdist
 
 clean:
-	rm -rf src/build build tmp var *~ *.whl __pycache__
+	rm -rf dist wheelhouse-final venv src/build build tmp var *~ *.whl __pycache__
 	python setup.py clean
 	pip uninstall -y pyspoa

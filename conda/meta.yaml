@@ -1,0 +1,45 @@
+package:
+    name: {{ environ.get('CONDA_PKG') }}
+    version: {{ environ.get('CONDA_PKG_VERSION') }}
+
+source:
+    path: ../
+
+build:
+    number: {{ environ.get('CONDA_PKG_BUILD', 0) }}
+    skip: True  # [py2k]
+
+requirements:
+    build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - make
+        - cmake
+    host:
+        - python
+        - pip
+        - pybind11
+        - zlib
+        - simde
+        - libgomp # [linux]
+        - llvm-openmp # [osx]
+        - cpu_features # [x86]
+    run:
+        - python
+
+test:
+    imports:
+        - spoa
+
+about:
+    home: https://github.com/nanoporetech/pyspoa
+    license: MIT License
+    license_file: LICENSE
+    summary: Python binding to spoa library.
+    doc_url: https://github.com/nanoporetech/spoa
+    dev_url: https://github.com/nanoporetech/spoa
+
+extra:
+    recipe-maintainers:
+        - cjw85
+        - iiSeymour

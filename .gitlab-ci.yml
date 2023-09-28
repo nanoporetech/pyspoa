@@ -1,0 +1,178 @@
+include:
+    - project: "epi2melabs/ci-templates"
+      file:
+          - "push-github.yaml"
+          - "push-conda.yaml"
+          - "snippets.yaml"
+
+image: ${UBUNTUIMAGE}:20.04
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GH_NAMESPACE: "nanoporetech"
+
+
+.prep-image: &prep-image |
+    export DEBIAN_FRONTEND=noninteractive
+    apt update -qq
+    apt install -y --no-install-recommends gcc autoconf libtool automake make curl wget zlib1g-dev git
+
+.minimal-python: &minimal-python |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq && apt-get install -y -qq python3-all-dev python3-venv
+
+
+stages:
+    - test
+    - prerelease
+    - release
+
+
+test:
+    stage: test
+    parallel:
+        matrix:
+            - PYENV_VERSION: ["3.8", "3.9", "3.10", "3.11"]
+    script:
+        - *prep-image
+        - !reference [.install, pyenv]
+        - !reference [.setup, pyenv-python]
+        - make test
+
+
+deploy-checks:
+    stage: prerelease
+    variables:
+        PACKAGE_NAME: pyspoa
+        LICENSE_FILE: BSD-4-CLAUSE
+    script:
+        - !reference [.check, python-version-setup]
+        - !reference [.check, changelog]
+        - !reference [.check, license]
+    rules:
+        - if: '$CI_COMMIT_TAG =~ /^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$/'
+
+
+.conda-before-script: &conda-before-script |
+    export CONDA_PKG=${CI_PROJECT_NAME}
+    export CONDA_PKG_VERSION=${CI_COMMIT_TAG/v/}
+    mkdir conda-build
+    cd conda-build
+
+conda:
+    extends:
+        - .deploy-conda-linux
+    variables:
+        UPLOAD: "no"
+        RECIPEPATH: "../conda"
+    before_script:
+        - *prep-image
+        - *conda-before-script
+
+conda-arm:
+    extends:
+        - .deploy-conda-linux-arm
+    variables:
+        UPLOAD: "no"
+        RECIPEPATH: "../conda"
+    before_script:
+        - *prep-image
+        - *conda-before-script
+
+conda-mac:
+    extends:
+        - .deploy-conda-mac
+    variables:
+        UPLOAD: "no"
+        RECIPEPATH: "../conda"
+    before_script:
+        - *conda-before-script
+
+conda-mac-arm:
+    extends:
+        - .deploy-conda-mac-arm
+    variables:
+        UPLOAD: "no"
+        RECIPEPATH: "../conda"
+    before_script:
+        - *conda-before-script
+
+
+### Python
+# The selection of wheels built here is mainly driven by the matrix
+# we build for medaka.
+
+bld:py-sdist:
+    stage: prerelease
+    script:
+        - *prep-image
+        - *minimal-python
+        - make sdist
+        - cd dist
+        - python3 -m venv venv
+        - . venv/bin/activate
+        - pip install --upgrade pip
+        - pip install *.tar.gz
+    artifacts:
+        paths:
+            - dist/*.tar.gz
+
+.many-linux:
+    stage: prerelease
+    script:
+        - echo "Building a Python ${PYWHEEL} wheel on manylinux_${FLAVOUR}"
+        - ./build-wheels.sh . ${PYWHEEL}
+    artifacts:
+        paths:
+            - wheelhouse-final/*.whl
+
+
+wheels-2014:
+    extends: .many-linux
+    image: "quay.io/pypa/manylinux2014_x86_64"
+    parallel:
+        matrix:
+            - PYWHEEL: [7, 8, 9]
+              FLAVOUR: ["2014"]
+
+
+wheels-arm-2014:
+    extends: .many-linux
+    tags:
+        - arm64
+    image: "quay.io/pypa/manylinux2014_aarch64"
+    parallel:
+        matrix:
+            - PYWHEEL: [8, 9, 10]
+              FLAVOUR: ["2014"]
+
+
+wheels-2_28:
+    extends: .many-linux
+    image: "quay.io/pypa/manylinux_2_28_x86_64"
+    parallel:
+        matrix:
+            - PYWHEEL: [8, 9, 10, 11]
+              FLAVOUR: ["2_28"]
+
+
+wheels-arm-2_28:
+    extends: .many-linux
+    tags:
+        - arm64
+    image: "quay.io/pypa/manylinux_2_28_aarch64"
+    parallel:
+        matrix:
+            - PYWHEEL: [8, 9, 10, 11]
+              FLAVOUR: ["2_28"]
+
+
+deploy:pypi:
+    stage: release
+    script:
+        - *minimal-python
+        - make pypi_build/bin/activate
+        - source pypi_build/bin/activate
+        - twine upload --non-interactive wheelhouse-final/pyspoa*.whl dist/pyspoa*.tar.gz
+    rules:
+        - if: '$CI_COMMIT_TAG =~ /^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+$/'
