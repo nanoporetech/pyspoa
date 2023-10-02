@@ -5,7 +5,7 @@
 using namespace pybind11::literals;  // for _a in pybind def
 
 auto poa(std::vector<std::string> sequences, int algorithm, bool genmsa,
-	 int m, int n, int g, int e, int q, int c) -> pybind11::tuple
+	 int m, int n, int g, int e, int q, int c, int min_coverage) -> pybind11::tuple
 {
     auto alignment_engine = spoa::AlignmentEngine::Create(
       static_cast<spoa::AlignmentType>(algorithm), m, n, g, e, q, c
@@ -18,7 +18,7 @@ auto poa(std::vector<std::string> sequences, int algorithm, bool genmsa,
 	    graph.AddAlignment(alignment, it);
     }
 
-    auto consensus = graph.GenerateConsensus();
+    auto consensus = graph.GenerateConsensus(min_coverage);
     std::vector<std::string> msa;
     if (genmsa)
         msa = graph.GenerateMultipleSequenceAlignment();
@@ -30,7 +30,8 @@ PYBIND11_MODULE(spoa, m) {
     m.def(
        "poa", &poa, "",
        "sequences"_a, "algorithm"_a=0, "genmsa"_a=true,
-       "m"_a=5, "n"_a=-4, "g"_a=-8, "e"_a=-6, "q"_a=-10, "c"_a=-4
+       "m"_a=5, "n"_a=-4, "g"_a=-8, "e"_a=-6, "q"_a=-10, "c"_a=-4,
+       "min_coverage"_a=-1
     );
 
     m.attr("__version__") = VERSION_INFO;
