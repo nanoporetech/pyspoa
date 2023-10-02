@@ -21,7 +21,13 @@ test: install
 sdist: venv/bin/activate
 	${IN_VENV} && python setup.py sdist
 
+IN_BUILD=. ./pypi_build/bin/activate
+pypi_build/bin/activate:
+	test -d pypi_build || $(PYTHON) -m venv pypi_build --prompt "(pypi) "
+	${IN_BUILD} && pip install pip --upgrade
+	${IN_BUILD} && pip install --upgrade pip setuptools twine wheel readme_renderer[md] keyrings.alt
+
 clean:
-	rm -rf dist wheelhouse-final venv src/build build tmp var *~ *.whl __pycache__
+	rm -rf dist wheelhouse-final venv pypi_build src/build build tmp var *~ *.whl __pycache__
 	python setup.py clean
 	pip uninstall -y pyspoa
